@@ -1,7 +1,7 @@
 import flet as ft
 from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base
 
 # Connect to DB
 engine = create_engine("sqlite:///db/dbperson.db")
@@ -17,9 +17,11 @@ class User(Base):
     age = Column(Integer)
 
 
-class MyClass(ft.UserControl):
+class MyClass(ft.Stack):
+
     def __init__(self):
-        super(MyClass, self).__init__()
+        super().__init__()
+
         self.selectId = ft.Text("", size=30)
         self.addBtn = ft.ElevatedButton("Add",
                                         on_click=self.addNewData,
@@ -50,6 +52,8 @@ class MyClass(ft.UserControl):
         # )
         # self.confirmDelete = False
 
+    def is_isolated(self):
+        return True
 
     def addNewData(self, e):
         user = User(name=self.nameInput.value, age=self.ageInput.value)
