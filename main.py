@@ -34,6 +34,23 @@ class MyClass(ft.UserControl):
         self.selectId.visible = False
         self.alldata = ft.Column()
 
+        # self.dlg_modal = ft.AlertDialog(
+        #     modal=True,
+        #     title=ft.Text("Please confirm"),
+        #     content=ft.Text("Do you really want to delete all those files?"),
+        #     actions=[
+        #         ft.TextButton("Yes", on_click=self.handle_close),
+        #         ft.TextButton("No", on_click=self.handle_close),
+        #     ],
+        #     actions_alignment=ft.MainAxisAlignment.END,
+        #     # on_dismiss=lambda e: self.page.add(
+        #     #     ft.Text("Modal dialog dismissed"),
+        #     # ),
+        #
+        # )
+        # self.confirmDelete = False
+
+
     def addNewData(self, e):
         user = User(name=self.nameInput.value, age=self.ageInput.value)
         Session = sessionmaker(bind=engine)
@@ -79,6 +96,7 @@ class MyClass(ft.UserControl):
         self.selectId.visible = False
         self.editBtn.visible = False
         self.cancelEditBtn.visible = False
+        self.addBtn.visible = True
 
         self.update()
 
@@ -107,6 +125,10 @@ class MyClass(ft.UserControl):
 
         # commit
         session.commit()
+
+        # clear data
+        self.nameInput.value = ""
+        self.ageInput.value = ""
 
         # refresh data
         self.alldata.controls.clear()
@@ -164,6 +186,14 @@ class MyClass(ft.UserControl):
         self.update()
 
     def processDelete(self, e):
+        # self.page.open(self.dlg_modal)
+        # self.page.dialog = self.dlg_modal
+        # self.page.show_dialog(dialog=self.dlg_modal)
+
+        # print(f"Returned from dialog")
+        # print(f"Confirm delete: {self.confirmDelete}")
+        # if self.confirmDelete:
+
         self.selectId.value = e.control.data.id  # things that came through data
         the_id = self.selectId.value
 
@@ -180,6 +210,12 @@ class MyClass(ft.UserControl):
 
         self.populate_list_from_db()
         self.page.update()
+
+    # def handle_close(self, e):
+    #     # self.page.close(self.dlg_modal)
+    #     self.page.close_dialog()
+    #     self.confirmDelete = True if e.control.text == "Yes" else False
+    #     self.page.add(ft.Text(f"Modal dialog closed with action: {e.control.text}"))
 
 
 def main(page: ft.Page):
