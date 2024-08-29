@@ -24,10 +24,11 @@ class MyClass(ft.UserControl):
         self.addBtn = ft.ElevatedButton("Add",
                                         on_click=self.addNewData,
                                         )
-        self.editBtn = ft.ElevatedButton("Edit",
+        self.editBtn = ft.ElevatedButton("Update",
                                          bgcolor=ft.colors.ORANGE,
                                          on_click=self.saveEditData,
                                          )
+        self.cancelEditBtn = ft.TextButton("Cancel", on_click=self.cancelEditData, visible=False)
         self.addBtn.visible = True
         self.editBtn.visible = False
         self.selectId.visible = False
@@ -44,7 +45,7 @@ class MyClass(ft.UserControl):
 
         # refresh
         self.alldata.controls.clear()
-        self.CallFromDatabase()
+        self.populate_list_from_db()
         self.page.update()
 
     def saveEditData(self, e):
@@ -69,8 +70,17 @@ class MyClass(ft.UserControl):
 
         # refresh
         self.alldata.controls.clear()
-        self.CallFromDatabase()
+        self.populate_list_from_db()
         self.page.update()
+
+    def cancelEditData(self, e):
+        self.nameInput.value = ""
+        self.ageInput.value = ""
+        self.selectId.visible = False
+        self.editBtn.visible = False
+        self.cancelEditBtn.visible = False
+
+        self.update()
 
     def build(self) -> ft.Column:
         self.nameInput = ft.TextField(label="User name")
@@ -81,7 +91,10 @@ class MyClass(ft.UserControl):
                 self.nameInput,
                 self.ageInput,
                 self.addBtn,
-                self.editBtn,
+                ft.Row([
+                    self.editBtn,
+                    self.cancelEditBtn
+                ]),
                 self.alldata,
             ]
         )
@@ -97,15 +110,15 @@ class MyClass(ft.UserControl):
 
         # refresh data
         self.alldata.controls.clear()
-        self.CallFromDatabase()
+        self.populate_list_from_db()
         self.page.update()
 
-        # call render function
 
     def did_mount(self):
-        self.CallFromDatabase()
+        self.populate_list_from_db()
 
-    def CallFromDatabase(self):
+    def populate_list_from_db(self):
+        """populates the list of users"""
         Session = sessionmaker(bind=engine)
         session = Session()
 
@@ -114,18 +127,22 @@ class MyClass(ft.UserControl):
         for u in users:
             self.alldata.controls.append(
                 ft.Container(
-                    bgcolor=ft.colors.RED,
+                    # bgcolor=ft.colors.RED,
                     padding=10,
                     content=ft.Column([
-                        ft.Text(f"name: {u.name}", color=ft.colors.WHITE, size=20),
-                        ft.Text(f"age: {u.age}", color=ft.colors.WHITE, size=20),
+                        ft.Text(f"name: {u.name}", color=ft.colors.BLACK, size=20),
+                        ft.Text(f"age: {u.age}", color=ft.colors.BLACK, size=20),
                         ft.Row([
                             ft.ElevatedButton("Edit", data=u, on_click=lambda e: self.processEdit(e)),
                             ft.ElevatedButton("Delete", data=u, on_click=lambda e: self.processDelete(e))
                         ])
-                    ])
+                    ]),
+                    border=ft.border.all(1, ft.colors.GREY),
+                    border_radius=ft.border_radius.all(10)
                 )
             )
+
+        # update UI
         self.update()
 
     def processEdit(self, e):
@@ -135,12 +152,15 @@ class MyClass(ft.UserControl):
         self.selectId.value = e.control.data.id  # things that came through data
         the_id = self.selectId.value
 
-        Session = sessionmaker(bind=engine)
-        session = Session()
+        # Session = sessionmaker(bind=engine)
+        # session = Session()
 
         self.nameInput.value = e.control.data.name
         self.ageInput.value = e.control.data.age
         self.editBtn.visible = True
+
+        self.cancelEditBtn.visible = True
+
         self.update()
 
     def processDelete(self, e):
@@ -158,12 +178,15 @@ class MyClass(ft.UserControl):
         # refresh data
         self.alldata.controls.clear()
 
-        self.CallFromDatabase()
+        self.populate_list_from_db()
         self.page.update()
 
 
 def main(page: ft.Page):
-    # page.update()
+    page.title = "ORM Example"
+    page.window_width = 600
+    page.window_height = 800
+    page.window_center()
     myclass = MyClass()
     page.add(myclass)
 
