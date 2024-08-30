@@ -1,8 +1,10 @@
 # A flet-orm Flet app
 
-An example of a minimal Flet app with SqlAlchemy
+A minimal example of Flet/Python app with SqlAlchemy
 
-Based on [Flet Tutorial - Crud With SqlAlchemy ORM SQLITE](https://www.youtube.com/watch?v=BdhDprSpIgU)
+![Demo](./flet-orms-demo.gif "Title")
+
+Inspired from [Flet Tutorial - Crud With SqlAlchemy ORM SQLITE](https://www.youtube.com/watch?v=BdhDprSpIgU)
 
 ## DB setup
 
