@@ -36,20 +36,19 @@ class MyClass(ft.Stack):
         self.selectId.visible = False
         self.alldata = ft.Column()
 
-        # self.dlg_modal = ft.AlertDialog(
-        #     modal=True,
-        #     title=ft.Text("Please confirm"),
-        #     content=ft.Text("Do you really want to delete all those files?"),
-        #     actions=[
-        #         ft.TextButton("Yes", on_click=self.handle_close),
-        #         ft.TextButton("No", on_click=self.handle_close),
-        #     ],
-        #     actions_alignment=ft.MainAxisAlignment.END,
-        #     # on_dismiss=lambda e: self.page.add(
-        #     #     ft.Text("Modal dialog dismissed"),
-        #     # ),
-        #
-        # )
+        self.dlg_modal = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Please confirm"),
+            content=ft.Text("Do you really want to delete this entry?"),
+            actions=[
+                ft.TextButton("Yes", on_click=lambda e: self.handle_close(e, True)),
+                ft.TextButton("No", on_click=lambda e: self.handle_close(e, False)),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+            # on_dismiss=lambda e: self.page.add(
+            #     ft.Text("Modal dialog dismissed"),
+            # ),
+        )
         # self.confirmDelete = False
 
     def is_isolated(self):
@@ -176,10 +175,6 @@ class MyClass(ft.Stack):
         self.selectId.visible = True
 
         self.selectId.value = e.control.data.id  # things that came through data
-        the_id = self.selectId.value
-
-        # Session = sessionmaker(bind=engine)
-        # session = Session()
 
         self.nameInput.value = e.control.data.name
         self.ageInput.value = e.control.data.age
@@ -190,36 +185,30 @@ class MyClass(ft.Stack):
         self.update()
 
     def processDelete(self, e):
-        # self.page.open(self.dlg_modal)
-        # self.page.dialog = self.dlg_modal
-        # self.page.show_dialog(dialog=self.dlg_modal)
+        self.dlg_modal.data = e.control.data
+        self.page.show_dialog(dialog=self.dlg_modal)
 
-        # print(f"Returned from dialog")
-        # print(f"Confirm delete: {self.confirmDelete}")
-        # if self.confirmDelete:
 
-        self.selectId.value = e.control.data.id  # things that came through data
-        the_id = self.selectId.value
+    def handle_close(self, e, option):
+        self.page.close_dialog()
 
-        Session = sessionmaker(bind=engine)
-        session = Session()
+        if option:
+            self.selectId.value = self.dlg_modal.data.id  # things that came through data
+            the_id = self.selectId.value
 
-        # delete user
-        user_to_delete = session.query(User).filter(User.id == int(the_id)).first()
-        session.delete(user_to_delete)
-        session.commit()
+            Session = sessionmaker(bind=engine)
+            session = Session()
 
-        # refresh data
-        self.alldata.controls.clear()
+            # delete user
+            user_to_delete = session.query(User).filter(User.id == int(the_id)).first()
+            session.delete(user_to_delete)
+            session.commit()
 
-        self.populate_list_from_db()
+            # refresh data
+            self.alldata.controls.clear()
+
+            self.populate_list_from_db()
         self.page.update()
-
-    # def handle_close(self, e):
-    #     # self.page.close(self.dlg_modal)
-    #     self.page.close_dialog()
-    #     self.confirmDelete = True if e.control.text == "Yes" else False
-    #     self.page.add(ft.Text(f"Modal dialog closed with action: {e.control.text}"))
 
 
 def main(page: ft.Page):
