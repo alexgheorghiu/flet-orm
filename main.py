@@ -4,7 +4,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 
 # Connect to DB
-engine = create_engine("sqlite:///db/dbperson.db")
+#engine = create_engine("sqlite:///db/dbperson.db")
+
+engine = create_engine("mysql+pymysql://fletorm:fletorm@localhost/fletorm")
 
 # Mapping
 Base = declarative_base()
